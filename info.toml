@@ -1,9 +1,9 @@
 [meta]
-name = "Plugin Manager (Dev)"
+name = "Plugin Manager"
 author = "Openplanet"
-category = "Test"
+category = "Meta"
+essential = true
 
 [script]
 imports = [ "Icons.as", "Formatting.as" ]
 timeout = 0
-defines = ["DEV"]

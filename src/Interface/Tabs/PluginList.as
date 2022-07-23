@@ -172,10 +172,10 @@ class PluginListTab : Tab
 
 			float rowHeight = Math::Ceil(UI::GetScrollMaxY() / (m_plugins.Length / Setting_PluginsPerRow + 1));
 
-			// draw a message before we check for being too close to the end
+			// draw a message before we check for being near the end
 			bool haveMorePages = m_page + 1 < m_pageCount;
 			if (haveMorePages) {
-				UI::TableNextRow(UI::TableRowFlags::None, rowHeight / 1.5);
+				UI::TableNextRow(UI::TableRowFlags::None, rowHeight);
 				UI::TableNextColumn();
 				string infiniteScrollMsg = (m_request is null ? "Scroll to Load" : "Loading") + " Page " + (m_page + 2);
 				UI::Dummy(vec2(0, rowHeight / 3.0));
@@ -187,7 +187,6 @@ class PluginListTab : Tab
 			bool waitedLongEnough = m_lastPageRequestFinished + 500 < Time::Now;
 			bool scrolledNearEnd = UI::GetScrollMaxY() == 0 || UI::GetScrollY() > (UI::GetScrollMaxY() - rowHeight);
 			if (waitedLongEnough && scrolledNearEnd && haveMorePages && m_request is null) {
-				trace(string::Join({'' + rowHeight, '' + UI::GetScrollY(), '' + UI::GetScrollMaxY()}, " / "));
 				StartRequestForPage(m_page + 1);
 			}
 		}

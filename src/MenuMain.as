@@ -9,6 +9,9 @@ void RenderMenuMain()
 		menuText = Icons::ShoppingCart;
 	}
 	menuText += "\\$z Plugin Manager";
+#if DEV
+	menuText += " (Dev)";
+#endif
 
 	if (UI::BeginMenu(menuText)) {
 		if (UI::MenuItem("\\$f39" + Icons::ShoppingCart + "\\$z Open manager", "", g_window.m_visible)) {

@@ -10,6 +10,8 @@ class PluginListTab : Tab
 	int m_pageCount;
 	array<PluginInfo@> m_plugins;
 
+	bool m_initialListRendered = false;
+
 	string GetLabel() override { return "Plugins"; }
 
 	vec4 GetColor() override { return vec4(0, 0.6f, 0.2f, 1); }
@@ -57,8 +59,13 @@ class PluginListTab : Tab
 	void StartRequest()
 	{
 		Clear();
+		StartRequestForPage(0);
+	}
 
+	void StartRequestForPage(int page) {
+		trace('doing request for page: ' + page);
 		dictionary params;
+		params['page'] = '' + page;
 		GetRequestParams(params);
 
 		string urlParams = "";
@@ -136,8 +143,9 @@ class PluginListTab : Tab
 	{
 		CheckRequest();
 
-		if (m_request !is null) {
+		if (m_request !is null && m_pageCount == 0) {
 			UI::Text("Loading list..");
+			m_initialListRendered = false;
 			return;
 		}
 
@@ -159,7 +167,27 @@ class PluginListTab : Tab
 				UI::TableNextColumn();
 				Controls::PluginCard(m_plugins[i], colWidth);
 			}
+
+			float rowHeight = Math::Ceil(UI::GetScrollMaxY() / (m_plugins.Length / Setting_PluginsPerRow + 1));
+
+			// draw a message before we check for being too close to the end
+			if (m_page + 1 < m_pageCount) {
+				UI::TableNextRow(UI::TableRowFlags::None, rowHeight);
+				UI::TableNextColumn();
+				string infiniteScrollMsg = (m_request is null ? "Scroll to Load" : "Loading") + " Page " + (m_page + 2);
+				UI::AlignTextToFramePadding();
+				UI::Text(infiniteScrollMsg);
+			}
+
+			// after the first frame, get the next page if there is excess vertical space or when we scroll to just a bit before the final row is in view
+			if (m_initialListRendered && UI::GetScrollMaxY() == 0 || UI::GetScrollY() > (UI::GetScrollMaxY() - 2 * rowHeight)) {
+				if (m_page + 1 < m_pageCount && m_request is null) {
+					trace(string::Join({'' + rowHeight, '' + UI::GetScrollY(), '' + UI::GetScrollMaxY()}, " / "));
+					StartRequestForPage(m_page + 1);
+				}
+			}
 			UI::EndTable();
 		}
+		m_initialListRendered = true;
 	}
 }

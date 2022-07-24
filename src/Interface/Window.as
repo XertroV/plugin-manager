@@ -64,6 +64,7 @@ class Window
 					@m_selectTab = null;
 				}
 
+				CheckPluginTabRequest(tab);
 				tab.PushTabStyle();
 
 				if (tab.CanClose()) {
@@ -96,6 +97,11 @@ class Window
 		}
 		UI::End();
 	}
+}
+
+void CheckPluginTabRequest(Tab@ tab) {
+	PluginTab@ pt = cast<PluginTab>(tab);
+	if (pt !is null) pt.CheckRequest();
 }
 
 Window g_window;
